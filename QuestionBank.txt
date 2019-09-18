@@ -1,0 +1,137 @@
+class Quiz extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={questions:["First Question","Second Question","Third Question","Fourth Question","Fifth Question"],
+                answers:[["a","b","c","d"],["a","b","c","d"],["a","b","c","d"],["a","b","c","d"],["a","b","c","d"],],
+                savedAnswers:["-1","-1","-1","-1","-1"],
+                qNumber:0,
+                isSubmitClicked:false,
+               };
+  }
+  private _questionNumber:number = 0;
+  render(){
+    return(
+      <div>
+   <h1 align="center">Quiz</h1>
+        <form>
+         <h3>{this.state.questions[this._questionNumber]}</h3>
+         <div>
+         <input type="radio" name="question" value={this.state.answers[this._questionNumber][0]}
+         checked={this.state.answers[this._questionNumber][0]==this.state.savedAnswers[this._questionNumber]}
+         onChange={()=>this.saveAnswer()}/>
+         <label for="question">{this.state.answers[this._questionNumber][0]}</label>
+         <br/>
+         <input type="radio" name="question"
+                checked={this.state.answers[this._questionNumber][1]==this.state.savedAnswers[this._questionNumber]}
+                onChange={()=>this.saveAnswer()}
+          value={this.state.answers[this._questionNumber][1]}/>
+         <label for="question">{this.state.answers[this._questionNumber][1]}</label>
+         <br/>
+         <input type="radio" name="question"
+                checked={this.state.answers[this._questionNumber][2]==this.state.savedAnswers[this._questionNumber]}
+                onChange={()=>this.saveAnswer()}
+          value={this.state.answers[this._questionNumber][2]}/>
+         <label for="question">{this.state.answers[this._questionNumber][2]}</label>
+          <br/>
+         <input type="radio" name="question"
+                checked={this.state.answers[this._questionNumber][3]==this.state.savedAnswers[this._questionNumber]}
+                onChange={()=>this.saveAnswer()}
+          value={this.state.answers[this._questionNumber][3]}/>
+        <label for="question">{this.state.answers[this._questionNumber][3]}</label>
+        </div>
+        </form>
+        {this._questionNumber > 0 &&
+        <button onClick={()=>this.decrementor()}> Previous</button>
+          }
+        {this._questionNumber <4 &&
+        <button onClick={()=>this.incrementor()}> Next</button>
+          }
+        <br/>
+        {!this.state.isSubmitClicked &&
+           <button onClick={()=>this.setState({isSubmitClicked:true})}> Submit</button>
+          }
+        {this.state.isSubmitClicked&&
+        <div>
+            <br/>
+            <p>You have Attempted <b>{this.calculateSubmittedCount()} questions</b>
+            {this.calculateSubmittedCount()!=5 &&<div> You have not Attempted {5-this.calculateSubmittedCount()} questions</div>}
+            </p>
+            <p>Are you sure to submit.Once Submitted cannot be modified</p>
+            <button onClick={()=>this.navigateNext()}>Yes</button>
+            <button onClick={()=>this.setState({isSubmitClicked:false})}>No</button>
+            </div>}
+        </div>);
+  }
+
+private incrementor(){
+  this._questionNumber++;
+  this.setState({qNumber:this._questionNumbe});
+};
+
+private decrementor(){
+  this._questionNumber--;
+  this.setState({qNumber:this._questionNumbe});
+};
+
+private saveAnswer(){
+  let answer=this.getRadioValue('question');
+  let newAnswer = this.state.savedAnswers;
+  newAnswer[this._questionNumber] = answer;
+  this.setState({savedAnswers:newAnswer});   
+ };
+
+ private calculateSubmittedCount(){
+  let answers=0;
+   this.state.savedAnswers.forEach(x=>{
+     if(x!="-1"){
+         answers++;
+       }
+    });
+  return(answers);
+ };
+
+private getRadioValue(theRadioGroup)
+{
+  var elements = document.getElementsByName(theRadioGroup);
+    for (var i = 0, l = elements.length; i < l; i++)
+    {
+      if (elements[i].checked)
+        {
+            return elements[i].value;
+        }
+    }
+};
+
+private navigateNext(){
+  ReactDOM.render(<SubmitForm selectedAnswers={this.state.savedAnswers}/>,mountNode);
+};
+
+}
+
+class SubmitForm extends React.Component{
+    constructor(props){
+    super(props);
+      this.state={correctAnswer:["a","a","a","a","a"]};
+    }
+  render(){
+    return(
+    <div>
+        <h2 align="centre">The Submited Answers</h2>
+        <ul>
+          {this.displaySubmitedAnswers()}
+        </ul>
+        </div>);
+  }
+
+private displaySubmitedAnswers(){
+  let answers=[];
+  let i=0;
+this.props.selectedAnswers.forEach(x=>{
+    answers.push(
+    <li>{"-1"!=x&& x}({x==this.state.correctAnswer[i]?"correct":x=="-1"?"Not Attempted" : "wrong"})</li>);
+  i++;
+});
+  return(answers);
+};
+}
+ReactDOM.render(<Quiz/>,mountNode);
